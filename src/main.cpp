@@ -1,7 +1,9 @@
 #include "main.h"
-#include "include/subsystems.hpp"
 
 using namespace pros;
+
+Motor arm_motor_1 (1, E_MOTOR_GEARSET_18);
+Motor arm_motor_2 (2, E_MOTOR_GEARSET_18, true);
 
 /**
  * A callback function for LLEMU's center button.
