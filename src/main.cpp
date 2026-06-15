@@ -2,8 +2,8 @@
 
 using namespace pros;
 
-Motor arm_motor_1 (1, E_MOTOR_GEARSET_18);
-Motor arm_motor_2 (2, E_MOTOR_GEARSET_18, true);
+Motor arm_motor_2 (-2, pros::v5::MotorGears::green);
+Controller master (E_CONTROLLER_MASTER);
 
 /**
  * A callback function for LLEMU's center button.
@@ -79,8 +79,8 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	MotorGroup left_mg({LEFT_MOTOR_1, LEFT_MOTOR_2});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	MotorGroup right_mg({RIGHT_MOTOR_1, RIGHT_MOTOR_2});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
+	MotorGroup left_mg({1, 2});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
+	MotorGroup right_mg({3, 4});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
 
 
 	while (true) {
