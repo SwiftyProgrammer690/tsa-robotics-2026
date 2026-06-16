@@ -77,24 +77,52 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	MotorGroup left_mg({LEFT_MOTOR_1, LEFT_MOTOR_2});    // Creates a motor group with forwards ports 1 & 3 and reversed port 2
-	MotorGroup right_mg({RIGHT_MOTOR_1, RIGHT_MOTOR_2});  // Creates a motor group with forwards port 5 and reversed ports 4 & 6
+	// Slow by default for precise obstacle-course navigation.
+	// DIGITAL_X toggles boost on/off.
+	constexpr double kSlowSpeed  = 0.35;
+	constexpr double kBoostSpeed = 1.0;
 
+	bool boost_enabled = false;
 
 	while (true) {
-		lcd::print(0, "%d %d %d", (lcd::read_buttons() & LCD_BTN_LEFT) >> 2,
-		                 (lcd::read_buttons() & LCD_BTN_CENTER) >> 1,
-		                 (lcd::read_buttons() & LCD_BTN_RIGHT) >> 0);  // Prints status of the emulated screen LCDs
-
-		// Arcade control scheme
-		int dir = master.get_analog(ANALOG_LEFT_Y);    // Gets amount forward/backward from left joystick
-		int turn = master.get_analog(ANALOG_RIGHT_X);  // Gets the turn left/right from right joystick
-		left_mg.move(dir - turn);                      // Sets left motor voltage
-		right_mg.move(dir + turn);                     // Sets right motor voltage
-		delay(20);                               // Run for 20 ms then update
-
-		if (master.get_digital(DIGITAL_A)) {
-
+		if (master.get_digital_new_press(DIGITAL_X)) {
+			boost_enabled = !boost_enabled;
 		}
+
+		const double speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
+
+		const int dir  = master.get_analog(ANALOG_LEFT_Y);
+		const int turn = master.get_analog(ANALOG_RIGHT_X);
+
+		left_mg.move(static_cast<int32_t>(speed * (dir - turn)));
+		right_mg.move(static_cast<int32_t>(speed * (dir + turn)));
+
+		if (master.get_digital(DIGITAL_UP)) {
+			arm_mg.move(80);
+		} else if (master.get_digital(DIGITAL_DOWN)) {
+			arm_mg.move(-80);
+		} else {
+			arm_mg.move(0);
+		}
+
+		if (master.get_digital(DIGITAL_R1)) {
+			wrist_motor.move(80);
+		} else if (master.get_digital(DIGITAL_R2)) {
+			wrist_motor.move(-80);
+		} else {
+			wrist_motor.move(0);
+		}
+
+		if (master.get_digital(DIGITAL_L1)) {
+			claw_motor.move(80);
+		} else if (master.get_digital(DIGITAL_L2)) {
+			claw_motor.move(-80);
+		} else {
+			claw_motor.move(0);
+		}
+
+		lcd::print(0, "Boost: %s", boost_enabled ? "ON " : "OFF");
+
+		delay(20);
 	}
 }

@@ -1,6 +1,9 @@
-#include "main.h"
-#include "pros/motors.h"
+#pragma once
+
+#include "pros/misc.hpp"
+#include "pros/motor_group.hpp"
 #include "pros/motors.hpp"
+#include "pros/vision.hpp"
 
 using namespace pros;
 
@@ -16,17 +19,8 @@ using namespace pros;
 
 extern MotorGroup left_mg;
 extern MotorGroup right_mg;
-
-// Motor left_motor_1 (LEFT_MOTOR_1, MOTOR_GEAR_GREEN, false);
-// Motor left_motor_2 (LEFT_MOTOR_2, MOTOR_GEAR_GREEN, true);
-// Motor right_motor_1 (RIGHT_MOTOR_1, MOTOR_GEAR_GREEN, false);
-// Motor right_motor_2 (RIGHT_MOTOR_2, MOTOR_GEAR_GREEN, true);
-
-Motor arm_motor_1 (ARM_MOTOR_1, v5::MotorGears::red);
-Motor arm_motor_2 (ARM_MOTOR_2, v5::MotorGears::red);
-Motor wrist_motor(WRIST_MOTOR, v5::MotorGears::green);
-Motor claw_motor(CLAW_MOTOR, v5::MotorGears::green);
-
-Vision vision_sensor(VISION_PORT);
-
-Controller master (E_CONTROLLER_MASTER);
+extern MotorGroup arm_mg;
+extern Motor wrist_motor;
+extern Motor claw_motor;
+extern Vision vision_sensor;
+extern Controller master;
