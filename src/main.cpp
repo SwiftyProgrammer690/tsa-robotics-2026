@@ -85,7 +85,7 @@ void opcontrol() {
 	bool boost_enabled = false;
 
 	while (true) {
-		if (master.get_digital_new_press(DIGITAL_X)) {
+		if (master.get_digital_new_press(DIGITAL_Y)) {
 			boost_enabled = !boost_enabled;
 		}
 
@@ -97,7 +97,7 @@ void opcontrol() {
 		left_mg.move(static_cast<int32_t>(speed * (dir - turn)));
 		right_mg.move(static_cast<int32_t>(speed * (dir + turn)));
 
-		if (master.get_digital(DIGITAL_UP)) {
+		if (master.get_digital(DIGITAL_RIGHT)) {
 			arm_mg.move(80);
 		} else if (master.get_digital(DIGITAL_DOWN)) {
 			arm_mg.move(-80);
