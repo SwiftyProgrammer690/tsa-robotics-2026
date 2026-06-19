@@ -1,7 +1,56 @@
 #include "main.h"
 #include "subsystems.hpp"
 
+#include <atomic>
+#include <cmath>
+
 using namespace pros;
+
+static std::atomic<bool> oscillate_active{false};
+
+// Turns the chassis to target_deg relative to the IMU zero point.
+// Exits early if oscillate_active is cleared.
+static void turn_to_angle(double target_deg) {
+	constexpr double  kP         = 1.8;
+	constexpr double  kTolerance = 1.5;  // degrees
+	constexpr int32_t kMinPower  = 22;   // minimum to overcome static friction
+
+	while (oscillate_active.load()) {
+		const double error = target_deg - imu.get_rotation();
+		if (std::abs(error) < kTolerance) break;
+
+		int32_t power = static_cast<int32_t>(kP * error);
+		if (power > 0 && power <  kMinPower) power =  kMinPower;
+		if (power < 0 && power > -kMinPower) power = -kMinPower;
+		if (power >  127) power =  127;
+		if (power < -127) power = -127;
+
+		left_mg.move( power);
+		right_mg.move(-power);
+
+		delay(10);
+	}
+
+	left_mg.move(0);
+	right_mg.move(0);
+}
+
+static void oscillate_task_fn(void*) {
+	imu.set_rotation(0.0);
+
+	while (oscillate_active.load()) {
+		turn_to_angle( 45.0);
+		if (!oscillate_active.load()) break;
+		delay(250);
+
+		turn_to_angle(-45.0);
+		if (!oscillate_active.load()) break;
+		delay(250);
+	}
+
+	left_mg.move(0);
+	right_mg.move(0);
+}
 
 /**
  * A callback function for LLEMU's center button.
@@ -27,9 +76,11 @@ void on_center_button() {
  */
 void initialize() {
 	lcd::initialize();
-	lcd::set_text(1, "Hello PROS User!");
-
+	lcd::set_text(1, "Calibrating IMU...");
 	lcd::register_btn1_cb(on_center_button);
+
+	imu.reset(true);  // blocking — waits until calibration is complete
+	lcd::set_text(1, "Ready!");
 }
 
 /**
@@ -78,7 +129,8 @@ void autonomous() {}
  */
 void opcontrol() {
 	// Slow by default for precise obstacle-course navigation.
-	// DIGITAL_X toggles boost on/off.
+	// DIGITAL_Y toggles boost on/off.
+	// DIGITAL_B toggles the ±45° oscillation routine on/off.
 	constexpr double kSlowSpeed  = 0.35;
 	constexpr double kBoostSpeed = 1.0;
 
@@ -89,13 +141,24 @@ void opcontrol() {
 			boost_enabled = !boost_enabled;
 		}
 
-		const double speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
+		if (master.get_digital_new_press(DIGITAL_B)) {
+			if (oscillate_active.load()) {
+				oscillate_active = false;  // task sees this and exits on its own
+			} else {
+				oscillate_active = true;
+				Task(oscillate_task_fn, nullptr, "oscillate");
+			}
+		}
 
-		const int dir  = master.get_analog(ANALOG_LEFT_Y);
-		const int turn = master.get_analog(ANALOG_RIGHT_X);
+		// Drivetrain — handed off to oscillate task while it's running
+		if (!oscillate_active.load()) {
+			const double speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
+			const int    dir   = master.get_analog(ANALOG_LEFT_Y);
+			const int    turn  = master.get_analog(ANALOG_RIGHT_X);
 
-		left_mg.move(static_cast<int32_t>(speed * (dir - turn)));
-		right_mg.move(static_cast<int32_t>(speed * (dir + turn)));
+			left_mg.move(static_cast<int32_t>(speed * (dir - turn)));
+			right_mg.move(static_cast<int32_t>(speed * (dir + turn)));
+		}
 
 		if (master.get_digital(DIGITAL_RIGHT)) {
 			arm_mg.move(80);
@@ -121,7 +184,9 @@ void opcontrol() {
 			claw_motor.move(0);
 		}
 
-		lcd::print(0, "Boost: %s", boost_enabled ? "ON " : "OFF");
+		lcd::print(0, "Boost:%s Osc:%s",
+		           boost_enabled          ? "ON " : "OFF",
+		           oscillate_active.load() ? "ON " : "OFF");
 
 		delay(20);
 	}

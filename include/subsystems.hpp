@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pros/imu.hpp"
 #include "pros/misc.hpp"
 #include "pros/motor_group.hpp"
 #include "pros/motors.hpp"
@@ -16,11 +17,13 @@ using namespace pros;
 #define WRIST_MOTOR 7
 #define CLAW_MOTOR 8
 #define VISION_PORT 9
+#define IMU_PORT    10
 
-extern MotorGroup left_mg;
-extern MotorGroup right_mg;
-extern MotorGroup arm_mg;
-extern Motor wrist_motor;
-extern Motor claw_motor;
-extern Vision vision_sensor;
-extern Controller master;
+extern MotorGroup  left_mg;
+extern MotorGroup  right_mg;
+extern MotorGroup  arm_mg;
+extern Motor       wrist_motor;
+extern Motor       claw_motor;
+extern Vision      vision_sensor;
+extern Controller  master;
+extern Imu         imu;
