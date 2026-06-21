@@ -8,16 +8,16 @@
 
 using namespace pros;
 
-#define LEFT_MOTOR_1 1
-#define LEFT_MOTOR_2 2
-#define RIGHT_MOTOR_1 3
-#define RIGHT_MOTOR_2 4
-#define ARM_MOTOR_1 5
-#define ARM_MOTOR_2 6
-#define WRIST_MOTOR 7
-#define CLAW_MOTOR 8
-#define VISION_PORT 9
-#define IMU_PORT    10
+#define LEFT_MOTOR_1 17
+#define LEFT_MOTOR_2 16
+#define RIGHT_MOTOR_1 18
+#define RIGHT_MOTOR_2 13
+#define ARM_MOTOR_1 1
+#define ARM_MOTOR_2 10
+#define WRIST_MOTOR 9
+#define CLAW_MOTOR 3
+#define VISION_PORT 20
+#define IMU_PORT    12
 
 extern MotorGroup  left_mg;
 extern MotorGroup  right_mg;

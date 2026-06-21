@@ -141,45 +141,45 @@ void opcontrol() {
 			boost_enabled = !boost_enabled;
 		}
 
-		if (master.get_digital_new_press(DIGITAL_B)) {
-			if (oscillate_active.load()) {
-				oscillate_active = false;  // task sees this and exits on its own
-			} else {
-				oscillate_active = true;
-				Task(oscillate_task_fn, nullptr, "oscillate");
-			}
-		}
+		// if (master.get_digital_new_press(DIGITAL_B)) {
+		// 	if (oscillate_active.load()) {
+		// 		oscillate_active = false;  // task sees this and exits on its own
+		// 	} else {
+		// 		oscillate_active = true;
+		// 		Task(oscillate_task_fn, nullptr, "oscillate");
+		// 	}
+		// }
 
 		// Drivetrain — handed off to oscillate task while it's running
 		if (!oscillate_active.load()) {
 			const double speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
-			const int    dir   = master.get_analog(ANALOG_LEFT_Y);
-			const int    turn  = master.get_analog(ANALOG_RIGHT_X);
+			const int    dir   = master.get_analog(ANALOG_RIGHT_X);
+			const int    turn  = master.get_analog(ANALOG_LEFT_Y);
 
-			left_mg.move(static_cast<int32_t>(speed * (dir - turn)));
-			right_mg.move(static_cast<int32_t>(speed * (dir + turn)));
+			right_mg.move(static_cast<int32_t>(speed * (dir - turn)));
+			left_mg.move(static_cast<int32_t>(speed * (dir + turn)));
 		}
 
 		if (master.get_digital(DIGITAL_RIGHT)) {
-			arm_mg.move(80);
+			arm_mg.move(30);
 		} else if (master.get_digital(DIGITAL_DOWN)) {
-			arm_mg.move(-80);
+			arm_mg.move(-30);
 		} else {
 			arm_mg.move(0);
 		}
 
 		if (master.get_digital(DIGITAL_R1)) {
-			wrist_motor.move(80);
+			wrist_motor.move(-40);
 		} else if (master.get_digital(DIGITAL_R2)) {
-			wrist_motor.move(-80);
+			wrist_motor.move(40);
 		} else {
 			wrist_motor.move(0);
 		}
 
 		if (master.get_digital(DIGITAL_L1)) {
-			claw_motor.move(80);
+			claw_motor.move(10);
 		} else if (master.get_digital(DIGITAL_L2)) {
-			claw_motor.move(-80);
+			claw_motor.move(-10);
 		} else {
 			claw_motor.move(0);
 		}
