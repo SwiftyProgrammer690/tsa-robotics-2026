@@ -169,11 +169,11 @@ void opcontrol() {
 		}
 
 		if (master.get_digital(DIGITAL_R1)) {
-			wrist_motor.move(-40);
+			wrist_mg.move(-40);
 		} else if (master.get_digital(DIGITAL_R2)) {
-			wrist_motor.move(40);
+			wrist_mg.move(40);
 		} else {
-			wrist_motor.move(0);
+			wrist_mg.move(0);
 		}
 
 		if (master.get_digital(DIGITAL_L1)) {

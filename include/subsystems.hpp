@@ -14,16 +14,17 @@ using namespace pros;
 #define RIGHT_MOTOR_2 13
 #define ARM_MOTOR_1 1
 #define ARM_MOTOR_2 10
-#define WRIST_MOTOR 9
+#define WRIST_MOTOR_1 9
+#define WRIST_MOTOR_2 11
 #define CLAW_MOTOR 3
 #define VISION_PORT 20
-#define IMU_PORT    12
+#define IMU_PORT 12
 
 extern MotorGroup  left_mg;
 extern MotorGroup  right_mg;
 extern MotorGroup  arm_mg;
-extern Motor       wrist_motor;
-extern Motor       claw_motor;
-extern Vision      vision_sensor;
-extern Controller  master;
-extern Imu         imu;
+extern MotorGroup wrist_mg;
+extern Motor claw_motor;
+extern Vision vision_sensor;
+extern Controller master;
+extern Imu imu;
