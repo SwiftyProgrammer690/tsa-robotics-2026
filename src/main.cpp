@@ -79,6 +79,10 @@ void initialize() {
 	lcd::set_text(1, "Calibrating IMU...");
 	lcd::register_btn1_cb(on_center_button);
 
+	// Hold position when idle so gravity doesn't drop the arm/wrist.
+	arm_mg.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
+	wrist_mg.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
+
 	imu.reset(true);  // blocking — waits until calibration is complete
 	lcd::set_text(1, "Ready!");
 }
@@ -165,21 +169,21 @@ void opcontrol() {
 		} else if (master.get_digital(DIGITAL_DOWN)) {
 			arm_mg.move(-30);
 		} else {
-			arm_mg.move(0);
-		}
-
-		if (master.get_digital(DIGITAL_R1)) {
-			wrist_mg.move(-40);
-		} else if (master.get_digital(DIGITAL_R2)) {
-			wrist_mg.move(40);
-		} else {
-			wrist_mg.move(0);
+			arm_mg.brake();  // hold position instead of coasting down
 		}
 
 		if (master.get_digital(DIGITAL_L1)) {
-			claw_motor.move(10);
+			wrist_mg.move(-40);
 		} else if (master.get_digital(DIGITAL_L2)) {
-			claw_motor.move(-10);
+			wrist_mg.move(40);
+		} else {
+			wrist_mg.brake();  // hold position instead of coasting down
+		}
+
+		if (master.get_digital(DIGITAL_R1)) {
+			claw_motor.move(40);
+		} else if (master.get_digital(DIGITAL_R2)) {
+			claw_motor.move(-40);
 		} else {
 			claw_motor.move(0);
 		}

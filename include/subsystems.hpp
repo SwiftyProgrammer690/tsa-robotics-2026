@@ -15,7 +15,7 @@ using namespace pros;
 #define ARM_MOTOR_1 1
 #define ARM_MOTOR_2 10
 #define WRIST_MOTOR_1 9
-#define WRIST_MOTOR_2 11
+#define WRIST_MOTOR_2 5
 #define CLAW_MOTOR 3
 #define VISION_PORT 20
 #define IMU_PORT 12
