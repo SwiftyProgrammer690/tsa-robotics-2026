@@ -82,6 +82,7 @@ void initialize() {
 	// Hold position when idle so gravity doesn't drop the arm/wrist.
 	arm_mg.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
 	wrist_mg.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
+	claw_motor.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
 
 	imu.reset(true);  // blocking — waits until calibration is complete
 	lcd::set_text(1, "Ready!");
@@ -165,27 +166,27 @@ void opcontrol() {
 		}
 
 		if (master.get_digital(DIGITAL_RIGHT)) {
-			arm_mg.move(30);
+			arm_mg.move(50);
 		} else if (master.get_digital(DIGITAL_DOWN)) {
-			arm_mg.move(-30);
+			arm_mg.move(-50);
 		} else {
 			arm_mg.brake();  // hold position instead of coasting down
 		}
 
-		if (master.get_digital(DIGITAL_L1)) {
+		if (master.get_digital(DIGITAL_R1)) {
 			wrist_mg.move(-40);
-		} else if (master.get_digital(DIGITAL_L2)) {
+		} else if (master.get_digital(DIGITAL_R2)) {
 			wrist_mg.move(40);
 		} else {
 			wrist_mg.brake();  // hold position instead of coasting down
 		}
 
-		if (master.get_digital(DIGITAL_R1)) {
-			claw_motor.move(40);
-		} else if (master.get_digital(DIGITAL_R2)) {
-			claw_motor.move(-40);
+		if (master.get_digital(DIGITAL_L1)) {
+			claw_motor.move(-30);
+		} else if (master.get_digital(DIGITAL_L2)) {
+			claw_motor.move(30);
 		} else {
-			claw_motor.move(0);
+			claw_motor.brake();
 		}
 
 		lcd::print(0, "Boost:%s Osc:%s",
