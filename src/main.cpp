@@ -84,6 +84,10 @@ void initialize() {
 	wrist_mg.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
 	claw_motor.set_brake_mode_all(E_MOTOR_BRAKE_HOLD);
 
+	// Brake (not coast) when drive sticks are released.
+	left_mg.set_brake_mode_all(E_MOTOR_BRAKE_BRAKE);
+	right_mg.set_brake_mode_all(E_MOTOR_BRAKE_BRAKE);
+
 	imu.reset(true);  // blocking — waits until calibration is complete
 	lcd::set_text(1, "Ready!");
 }
@@ -136,8 +140,9 @@ void opcontrol() {
 	// Slow by default for precise obstacle-course navigation.
 	// DIGITAL_Y toggles boost on/off.
 	// DIGITAL_B toggles the ±45° oscillation routine on/off.
-	constexpr double kSlowSpeed  = 0.35;
-	constexpr double kBoostSpeed = 1.0;
+	constexpr double kSlowSpeed     = 0.35;
+	constexpr double kSlowTurnSpeed = 0.55;  // faster than drive so turns feel responsive
+	constexpr double kBoostSpeed    = 1.0;
 
 	bool boost_enabled = false;
 
@@ -157,12 +162,18 @@ void opcontrol() {
 
 		// Drivetrain — handed off to oscillate task while it's running
 		if (!oscillate_active.load()) {
-			const double speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
-			const int    dir   = master.get_analog(ANALOG_RIGHT_X);
-			const int    turn  = master.get_analog(ANALOG_LEFT_Y);
+			const double drive_speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
+			const double turn_speed  = boost_enabled ? kBoostSpeed : kSlowTurnSpeed;
+			const int    dir         = master.get_analog(ANALOG_RIGHT_X);
+			const int    turn        = master.get_analog(ANALOG_LEFT_Y);
 
-			right_mg.move(static_cast<int32_t>(speed * (dir - turn)));
-			left_mg.move(static_cast<int32_t>(speed * (dir + turn)));
+			if (dir == 0 && turn == 0) {
+				left_mg.brake();
+				right_mg.brake();
+			} else {
+				right_mg.move(static_cast<int32_t>(turn_speed * dir - drive_speed * turn));
+				left_mg.move(static_cast<int32_t>(turn_speed * dir + drive_speed * turn));
+			}
 		}
 
 		if (master.get_digital(DIGITAL_RIGHT)) {
