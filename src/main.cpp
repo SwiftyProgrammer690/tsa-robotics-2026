@@ -164,8 +164,8 @@ void opcontrol() {
 		if (!oscillate_active.load()) {
 			const double drive_speed = boost_enabled ? kBoostSpeed : kSlowSpeed;
 			const double turn_speed  = boost_enabled ? kBoostSpeed : kSlowTurnSpeed;
-			const int    dir         = master.get_analog(ANALOG_RIGHT_X);
-			const int    turn        = master.get_analog(ANALOG_LEFT_Y);
+			const int dir = master.get_analog(ANALOG_RIGHT_X);
+			const int turn = master.get_analog(ANALOG_LEFT_Y);
 
 			if (dir == 0 && turn == 0) {
 				left_mg.brake();
