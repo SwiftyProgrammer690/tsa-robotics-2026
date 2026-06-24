@@ -142,7 +142,7 @@ void opcontrol() {
 	// DIGITAL_B toggles the ±45° oscillation routine on/off.
 	constexpr double kSlowSpeed     = 0.35;
 	constexpr double kSlowTurnSpeed = 0.55;  // faster than drive so turns feel responsive
-	constexpr double kBoostSpeed    = 1.0;
+	constexpr double kBoostSpeed    = 0.7;
 
 	bool boost_enabled = false;
 
